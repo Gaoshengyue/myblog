@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>作者后台添加文章</title>
+          <link rel="icon" href="/static/img/bat2.png">
+     <link rel="stylesheet" href="/static/dist/css/bootstrap.css">
+    <script src="/static/jquery-3.2.1.min.js"></script>
+    <script src="/static/dist/js/bootstrap.js"></script>
+       <script src="/static/kindeditor/kindeditor-all.js"></script>
+      <link href="/static/sweetalert/sweetalert.css" rel="stylesheet">
+    <script src="/static/sweetalert/sweetalert.min.js"></script>
+</head>
+<style>
+    .titleh{
+        color: white;
+        margin-left: 30%;
+    }
+</style>
+<body>
+<div class="jumbotron " style="background-color: #5cb85c">
+
+<div class="container" >
+      <h3><a href="/index/" style="color: white" >首页</a></h3>
+  <h1 class="titleh" style="color: white">Add Article</h1>
+  <p class="titleh">编写新文章</p>
+  <p style="margin-left: 30%;color: white;font-size: 15px"><a class="btn btn-default btn-lg" href="#" role="button" style="color:#5cb85c"  data-toggle="modal" data-target="#gridSystemModal">添加文章标签</a>&nbsp;&nbsp;新文章已有标签无需添加</p>
+    <p class="titleh">查看所有文章</p>
+  <p style="margin-left: 30%;color: white;font-size: 15px"><a class="btn btn-default btn-lg" href="/article_list/" role="button" style="color:#5cb85c">查看文章(可编辑)</a></p>
+</div>
+    </div>
+
+{#模态框开始#}
+<div class="modal fade" tabindex="-1" role="dialog" id="gridSystemModal" aria-labelledby="gridSystemModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="gridSystemModalLabel">Modal title</h4>
+      </div>
+      <div class="modal-body">
+
+          <label for="tagname">标签title</label>
+          <input id="tagname" type="text" class="form-control" placeholder="请输入标签名称" name="tag" style="color: #5cb85c;">
+          <label for="cate" style="margin-top: 20px">所属分类</label>
+          <select name="cate" id="cate" class="form-control" style="color: #5cb85c;">
+          {% for item in cate_list %}
+              <option value="{{ item.id }}">{{ item.title }}</option>
+              {% endfor %}
+      </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="add_tag" data-dismiss="modal">添加标签</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+{#模态框结束#}
+<div class="container-fluid" style="margin-top: -30px">
+<div class="row" style="background-color: #66afe9;">
+        <div class="col-sm-8 col-sm-offset-2">
+            <div class="panel panel-success" style="margin-top: 20px">
+  <div class="panel-heading">
+    <h3 class="panel-title ">编写文章</h3>
+  </div>
+  <form class="panel-body" method="post">
+  {% csrf_token %}
+      <label for="title">标题</label>
+        <input id="title" type="text" class="form-control" placeholder="请输入标题名称" name="title">
+      <p>
+                     <textarea name="content" id="editor_id" cols="30" rows="10"></textarea>
+                 </p>
+      <p style="color: #66afe9"><select name="tag" id="" class="form-control" style="width: 150px;color: #5cb85c;">
+         {% for item in tag_list %}
+             <option value="{{ item.id }}">{{ item.title }}</option>
+          {% endfor %}
+      </select>
+          如没有所需标签请创建
+      </p>
+      <button type="submit" class="btn btn-success">添加文章</button>
+  </form>
+</div>
+
+        </div>
+</div>
+    </div>
+</body>
+ <script>
+
+           // 富文本编辑器
+            KindEditor.ready(function(K) {
+                window.editor = K.create('#editor_id',{
+                    width:"870px",
+                    height:"600px",
+                    //items:[]
+                    resizeType:1,
+                     filterMode: false,
+                    uploadJson:"/upload_img/",
+                    extraFileUploadParams :{
+                        csrfmiddlewaretoken:$("[name='csrfmiddlewaretoken']").val()
+
+                    },
+                    filePostName:"article_img"
+
+                });
+        });
+     $('#add_tag').on('click',function () {
+         $.ajax({
+             url:'/add_tag/',
+             type:'POST',
+             data:{'tag':$('#tagname').val(),'cate':$('#cate').val()},
+             headers:{"X-CSRFToken":$('[name="csrfmiddlewaretoken"]').val()},
+             success:function (data) {
+                 console.log(data)
+                if (data.status==1){
+                    swal(data.msg, "请继续编写文章","success");
+
+                }
+                else {
+                    swal(data.msg,"请重新添加",'warning')
+                }
+             }
+         })
+     })
+
+     </script>
+</html>

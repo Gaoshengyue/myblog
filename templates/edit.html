@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>修改文章</title>
+          <link rel="icon" href="/static/img/bat2.png">
+
+            <link rel="stylesheet" href="/static/dist/css/bootstrap.css">
+        <script src="/static/jquery-3.2.1.min.js"></script>
+        <script src="/static/dist/js/bootstrap.js"></script>
+          <script src="/static/kindeditor/kindeditor-all.js"></script>
+</head>
+<style>
+    .article{
+        margin-left: 30%;
+    }
+</style>
+<body>
+
+<div class="jumbotron" style="background-color: #2aabd2;color: white">
+    <div class="container">
+       <h3><a href="/index/" style="color: white" >首页</a></h3>
+  <h1 class="article">Edit Article</h1>
+        <p class="article">修改文章</p>
+</div>
+    </div>
+<div class="container-fluid" style="margin-top: -30px">
+<div class="row" style="background-color: #5cb85c;">
+        <div class="col-sm-8 col-sm-offset-2">
+            <div class="panel panel-info" style="margin-top: 20px">
+  <div class="panel-heading">
+    <h3 class="panel-title ">编写文章</h3>
+  </div>
+  <form class="panel-body" method="post" action="/edit/{{ ad.id }}">
+  {% csrf_token %}
+   <label for="title">标题</label>
+        <input id="title" type="text" class="form-control" placeholder="请输入标题名称" name="title" value="{{ ad.title }}">
+      <p>
+                     <textarea name="content" id="editor_id" cols="30" rows="10">
+                    {{ ad.content }}
+                     </textarea>
+                 </p>
+      <p style="color: #5cb85c"><select name="tag" id="" class="form-control" style="width: 150px;color: #2aabd2;">
+           {% for item in tag_list %}
+               {% if item.id == ad.tag.id %}
+                <option value="{{ item.id }}" selected>{{ item.title }}</option>
+                   {% else %}
+                   <option value="{{ item.id }}">{{ item.title }}</option>
+               {% endif %}
+          {% endfor %}
+      </select>
+          如没有所需标签请创建
+      </p>
+      <button type="submit" class="btn btn-info">确认修改</button>
+  </form>
+</div>
+
+        </div>
+</div>
+    </div>
+</body>
+ <script>
+ // 富文本编辑器
+            KindEditor.ready(function(K) {
+                window.editor = K.create('#editor_id',{
+                    html : $('#editor_id').val(),
+                    width:"870px",
+                    height:"600px",
+                     filterMode: false,
+                    //items:[]
+                    resizeType:1,
+                    uploadJson:"/upload_img/",
+                    extraFileUploadParams :{
+                        csrfmiddlewaretoken:$("[name='csrfmiddlewaretoken']").val()
+
+                    },
+                    filePostName:"article_img"
+
+                });
+        });
+
+     </script>
+</html>

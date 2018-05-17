@@ -1,0 +1,179 @@
+{% block sidebar %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    {% if article %}
+
+    <title>{{ article.title }}</title>
+        {% else %}
+        <title>not found</title>
+    {% endif %}
+      <link rel="icon" href="/static/img/bat2.png">
+     <link rel="stylesheet" href="/static/dist/css/bootstrap.css">
+{#    <link rel="stylesheet" href="/static/menu/css/index.css">#}
+    <script src="/static/jquery-3.2.1.min.js"></script>
+    <script src="/static/dist/js/bootstrap.js"></script>
+      <link href="/static/sweetalert/sweetalert.css" rel="stylesheet">
+    <script src="/static/sweetalert/sweetalert.min.js"></script>
+</head>
+<style>
+    .left-cate{
+        position:fixed;
+        margin-top: 50px;
+        height:600px;
+        overflow:auto;
+    }
+</style>
+<body style="background-color: #eeeeee;margin: 0;padding-bottom:100px">
+
+{#导航栏开始#}
+<nav class="navbar navbar-default navbar-inverse">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+        <a href="javascript:void(0)"><strong class="navbar-brand" style="font-size: 30px; ">Symoon</strong></a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="row">
+{#      分类的按钮#}
+    <div class="col-sm-offset-1">
+            <ul class="nav navbar-nav">
+                {% for item in cate_list %}
+                        <li><a href="/index/cate/{{ item.id }}">{{ item.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+{#分类按钮结束#}
+
+    <div class="collapse navbar-collapse col-sm-offset-8" id="bs-example-navbar-collapse-1">
+
+{#        搜索功能#}
+           <div class="navbar-form navbar-left">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" id="data">
+        </div>
+               {% csrf_token %}
+        <button type="submit" class="btn btn-info" id="search">搜索知识点</button>
+      </div>
+
+{#        搜索功能结束#}
+
+{#        作者后台相关#}
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">作者相关 <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="/write/">作者后台(无权误入)</a></li>
+               <li><a href="/symoon/">作者资料</a></li>
+              <li><a href="https://github.com/Gaoshengyue">作者Github</a></li>
+              <li><a href="http://www.cnblogs.com/gaoshengyue/">作者cnblog</a></li>
+              <li><a href="javascript:void(0)" id="dashang">打赏</a></li>
+          </ul>
+        </li>
+      </ul>
+{#        后台相关结束#}
+        </div>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+{#导航栏结束#}
+
+    {% block content %}
+<div class="container-fluid">
+    <div class="row">
+{#        左侧栏#}
+        <div class="col-sm-3 left-cate" style="margin-left: 20px">
+            {% for item in tag_list %}
+              {% if article in item.article.all %}
+           <div>
+               <a href="javascript:void(0)" style="font-size: 30px;color: #000000;"><h3 class="glyphicon glyphicon-chevron-down button">{{ item.title }}</h3></a>
+
+                   <div style="margin-left: 30px;">
+                               {% for article_item in item.article.all %}
+                                   {% if article.id == article_item.id %}
+                                        <p><a href="/index/article/{{ article_item.id }}" style="font-size: 20px;color: #b92c28;">{{ article_item.title }}</a></p>
+                                   {% else %}
+                       <p><a href="/index/article/{{ article_item.id }}" style="font-size: 20px;color: #333333;">{{ article_item.title }}</a></p>
+                                   {% endif %}
+                                              {% endfor %}
+               </div>
+
+
+           </div>
+                  {% else %}
+                   <div>
+               <a href="javascript:void(0)" style="font-size: 30px;color: #000000;"><h3 class="glyphicon glyphicon-chevron-left button">{{ item.title }}</h3></a>
+
+                   <div style="margin-left: 30px;display: none">
+                               {% for article in item.article.all %}
+                       <p><a href="/index/article/{{ article.id }}" style="font-size: 20px;color: #333333;">{{ article.title }}</a></p>
+                                              {% endfor %}
+               </div>
+
+
+           </div>
+   {% endif %}
+            {% endfor %}
+        </div>
+{#        左侧栏结束#}
+        <div class="col-sm-7 col-sm-offset-4" style="background-color: white">
+       <div style="margin-top: 10px;">
+       <strong style="font-size: 30px;">{{ article.title }}</strong>
+            <div >
+            {{ article.content |safe}}
+            </div>
+       </div>
+        </div>
+
+    </div>
+<div style="background-color: #eeeeee;height:30px "></div>
+</div>
+<div style='maring-left:400px;'><h2>Copyright © 2018 Symoon 京ICP备18020018号-1</h2></div>
+{% endblock %}
+
+</body>
+<script>
+    $('.button').on('click',function () {
+        if ( $(this).attr('class')=='glyphicon glyphicon-chevron-left button'){
+            $(this).parent().parent().siblings().children().filter('a').children().attr('class','glyphicon glyphicon-chevron-left button').parent().next().slideUp("slow")
+             $(this).attr('class','glyphicon glyphicon-chevron-down button');
+            $(this).parent().next().slideToggle("slow");
+        }
+        else {
+            $(this).attr('class','glyphicon glyphicon-chevron-left button');
+             $(this).parent().next().slideToggle("slow")
+        }
+
+    })
+    $('#search').on('click',function () {
+        $.ajax({
+            url:'/search/',
+            type:'POST',
+            data:{'data':$('#data').val()},
+             headers:{"X-CSRFToken":$('[name="csrfmiddlewaretoken"]').val()},
+            success:function (data) {
+            if (data.status==1){
+                location.href='/index/article/'+data.aid
+            }
+            else {
+                location.href='/notfound/'
+            }
+            }
+        })
+    });
+    $('#dashang').on('click',function () {
+
+				swal({
+				  title: "看爽了给点打赏!",
+				  text: "<img src='/static/img/pay.jpg' style='width:200px;height:300px'>",
+				  html: true
+				});
+
+    })
+</script>
+</html>
+{% endblock %}
